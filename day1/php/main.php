@@ -2,17 +2,31 @@
 
 $file = fopen('../data.txt', 'r');
 $current = 0;
-$max = 0;
+$topMax = [0];
 
 function onUserElfChanged()
 {
-    global $current, $max;
+    global $current, $topMax;
 
-    if ($current >= $max) {
-        $max = $current;
+    $minValue = intval(min($topMax));
+    $currentInt = intval($current);
+    $current = 0;
+
+    if ($currentInt <= $minValue) {
+        return;
     }
 
-    $current = 0;
+    if (count($topMax) < 3) {
+        $topMax[] = $currentInt;
+        return;
+    }
+
+    foreach ($topMax as &$value) {
+        if ($minValue === $value) {
+            $value = $currentInt;
+        }
+    }
+    unset($value);
 }
 
 while (($buffer = fgets($file, 4096)) !== false) {
@@ -24,4 +38,4 @@ while (($buffer = fgets($file, 4096)) !== false) {
 }
 fclose($file);
 
-echo $max . PHP_EOL;
+echo array_sum($topMax) . PHP_EOL;

@@ -4,21 +4,60 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"strconv"
 )
 
-var currentcal int = 0
-var maxcal int = 0
+func minValueIndex(arr []int) (currentMin int, currentMinIndex int) {
 
-func onElfChanged() {
-	if currentcal >= maxcal {
-		maxcal = currentcal
+	currentMin = math.MaxInt
+	currentMinIndex = 0
+
+	for i, v := range arr {
+		if v <= currentMin {
+			currentMin = v
+			currentMinIndex = i
+		}
 	}
-	currentcal = 0
+
+	if currentMin == math.MaxInt && currentMinIndex == 0 {
+		currentMinIndex = 0
+		currentMin = 0
+	}
+
+	return currentMin, currentMinIndex
+}
+
+func updateArray(arr []int, val int) []int {
+	if len(arr) < 3 {
+		arr = append(arr, val)
+		return arr
+	}
+
+	minV, minI := minValueIndex(arr)
+
+	if val > minV {
+		arr[minI] = val
+	}
+
+	return arr
+}
+
+func sumArr(arr []int) int {
+	summ := 0
+
+	for _, v := range arr {
+		summ += v
+	}
+
+	return summ
 }
 
 func main() {
+
+	currentcal := 0
+	maxcal := []int{0, 0, 0}
 
 	file, err := os.Open("../data.txt")
 	if err != nil {
@@ -32,7 +71,8 @@ func main() {
 		text := scanner.Text()
 
 		if text == "" {
-			onElfChanged()
+			maxcal = updateArray(maxcal, currentcal)
+			currentcal = 0
 			continue
 		}
 
@@ -49,5 +89,5 @@ func main() {
 		currentcal += n
 	}
 
-	fmt.Println(maxcal)
+	fmt.Println(sumArr(maxcal))
 }
